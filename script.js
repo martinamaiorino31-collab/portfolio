@@ -126,7 +126,12 @@ const buildTurningLeaf = (current, target, forward) => {
   backInner.append(clonePageForTurn(target));
   back.append(backInner);
 
-  leaf.append(front, back);
+  const curl = document.createElement('span');
+  curl.className = 'book-curl';
+  const edge = document.createElement('span');
+  edge.className = 'book-paper-edge';
+
+  leaf.append(front, back, curl, edge);
   layer.append(leaf);
   document.body.append(layer);
   requestAnimationFrame(() => requestAnimationFrame(() => layer.classList.add('is-turning')));
