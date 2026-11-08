@@ -10,6 +10,7 @@ const bookCurrent = document.querySelector('[data-book-current]');
 const bookTotal = document.querySelector('[data-book-total]');
 const bookTitle = document.querySelector('[data-book-title]');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const turnDuration = 1080;
 
 document.querySelectorAll('[data-year]').forEach((year) => {
   year.textContent = new Date().getFullYear();
@@ -109,6 +110,17 @@ const buildTurningLeaf = (current, target, forward) => {
   layer.className = `book-flip ${forward ? 'book-flip-next' : 'book-flip-prev'}`;
   layer.setAttribute('aria-hidden', 'true');
 
+  const underlay = document.createElement('div');
+  underlay.className = 'book-underlay';
+  underlay.append(clonePageForTurn(target));
+
+  const stationary = document.createElement('div');
+  stationary.className = `book-stationary ${forward ? 'book-stationary-left' : 'book-stationary-right'}`;
+  stationary.append(clonePageForTurn(current));
+
+  const hingeShadow = document.createElement('span');
+  hingeShadow.className = 'book-hinge-shadow';
+
   const leaf = document.createElement('div');
   leaf.className = 'book-leaf';
 
@@ -132,7 +144,7 @@ const buildTurningLeaf = (current, target, forward) => {
   edge.className = 'book-paper-edge';
 
   leaf.append(front, back, curl, edge);
-  layer.append(leaf);
+  layer.append(underlay, stationary, hingeShadow, leaf);
   document.body.append(layer);
   requestAnimationFrame(() => requestAnimationFrame(() => layer.classList.add('is-turning')));
   return layer;
@@ -156,11 +168,13 @@ const turnToPage = (index) => {
   }
 
   const turningLeaf = buildTurningLeaf(current, target, forward);
-  window.setTimeout(() => setBookPage(nextIndex), 430);
+  document.documentElement.classList.add('is-page-turning');
+  window.setTimeout(() => setBookPage(nextIndex), turnDuration - 35);
   window.setTimeout(() => {
     turningLeaf.remove();
+    document.documentElement.classList.remove('is-page-turning');
     turningPage = false;
-  }, 940);
+  }, turnDuration + 45);
 };
 
 bookPrevious?.addEventListener('click', () => turnToPage(currentBookPage - 1));
@@ -180,19 +194,22 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 bookPages.forEach((page) => {
   page.addEventListener('scroll', updateBookProgress, { passive: true });
   page.addEventListener('wheel', (event) => {
-    if (turningPage || Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+    if (turningPage) return;
+    const horizontalSwipe = Math.abs(event.deltaX) > Math.abs(event.deltaY);
+    const turnDelta = horizontalSwipe ? event.deltaX : event.deltaY;
+    if (Math.abs(turnDelta) < 2) return;
     const atTop = page.scrollTop <= 1;
     const atBottom = page.scrollTop + page.clientHeight >= page.scrollHeight - 2;
-    const canTurn = (event.deltaY > 0 && atBottom) || (event.deltaY < 0 && atTop);
+    const canTurn = horizontalSwipe || (turnDelta > 0 && atBottom) || (turnDelta < 0 && atTop);
     if (!canTurn) {
       wheelIntent = 0;
       return;
     }
     event.preventDefault();
-    wheelIntent += event.deltaY;
+    wheelIntent += turnDelta;
     window.clearTimeout(wheelReset);
-    wheelReset = window.setTimeout(() => { wheelIntent = 0; }, 180);
-    if (Math.abs(wheelIntent) > 70) {
+    wheelReset = window.setTimeout(() => { wheelIntent = 0; }, 220);
+    if (Math.abs(wheelIntent) > (horizontalSwipe ? 52 : 70)) {
       turnToPage(currentBookPage + (wheelIntent > 0 ? 1 : -1));
       wheelIntent = 0;
     }
@@ -205,7 +222,7 @@ bookPages.forEach((page) => {
   page.addEventListener('touchend', (event) => {
     const deltaX = event.changedTouches[0].clientX - touchStartX;
     const deltaY = event.changedTouches[0].clientY - touchStartY;
-    if (Math.abs(deltaX) > 70 && Math.abs(deltaX) > Math.abs(deltaY) * 1.2) {
+    if (Math.abs(deltaX) > 52 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
       turnToPage(currentBookPage + (deltaX < 0 ? 1 : -1));
     }
   }, { passive: true });
