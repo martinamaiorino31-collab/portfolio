@@ -1,2 +1,5 @@
 # Local high-resolution PDF render masters
 assets/pdf-slides/*.png
+
+# Local 3D conversion and browser checks
+.work-3d/

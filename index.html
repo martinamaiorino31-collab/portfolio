@@ -12,6 +12,7 @@
   <title>Martina Maiorino — Selected works</title>
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
+  <script type="module" src="model-preview.js"></script>
 </head>
 <body>
   <a class="skip-link" href="#contenuto">Vai ai progetti</a>
@@ -68,12 +69,17 @@
         </div>
         <div class="project-actions"><p class="project-status">Video di progetto</p><p>Blender<br>2025—2026</p></div>
       </div>
-      <figure class="document-stage video-stage reveal">
+      <figure class="document-stage video-stage model-stage reveal" data-model-stage data-model-src="assets/models/ulisse.glb" data-model-alt="Modello 3D interattivo della lampada Ulisse" data-camera-orbit="20deg 78deg 108%" data-model-return="Torna al video">
         <span class="document-tag">Animazione / Ulisse</span>
         <video controls playsinline preload="metadata" poster="assets/ulisse-poster.png">
           <source src="assets/ulisse-animation.mp4" type="video/mp4">
           Il browser non supporta la riproduzione video.
         </video>
+        <div class="model-toolbar">
+          <button class="model-toggle" type="button" data-model-open aria-pressed="false"><span aria-hidden="true">◈</span> Esplora in 3D</button>
+          <button class="model-reset" type="button" data-model-reset hidden>Ripristina vista</button>
+        </div>
+        <p class="model-status" data-model-status role="status" aria-live="polite"></p>
         <figcaption class="media-caption">Modello 3D · materiali · luce</figcaption>
       </figure>
     </section>
@@ -149,9 +155,14 @@
         </div>
         <div class="project-actions"><p class="project-status">Concept + visualizzazione</p><p>Design 2<br>2025—2026</p></div>
       </div>
-      <figure class="document-stage image-stage reveal">
+      <figure class="document-stage image-stage model-stage reveal" data-model-stage data-model-src="assets/models/nodi.glb" data-model-alt="Modello volumetrico 3D di NODI con materiali neutri" data-camera-orbit="25deg 48deg 105%" data-model-return="Torna alla tavola" data-model-note="Studio volumetrico · materiali neutri">
         <span class="document-tag">NODI / textile design</span>
         <img src="assets/pdf-slides/nodi-board-01.jpg" alt="Tavola introduttiva del tappeto interattivo NODI in rosa e blu" width="2500" height="1789">
+        <div class="model-toolbar">
+          <button class="model-toggle" type="button" data-model-open aria-pressed="false"><span aria-hidden="true">◈</span> Modello di studio 3D</button>
+          <button class="model-reset" type="button" data-model-reset hidden>Ripristina vista</button>
+        </div>
+        <p class="model-status" data-model-status role="status" aria-live="polite"></p>
         <figcaption class="media-caption">Texture · gesto · relazione</figcaption>
       </figure>
     </section>
@@ -175,9 +186,14 @@
         </div>
         <div class="project-actions"><p class="project-status">Visual research</p><p>AI + rendering<br>Scenario futuro</p></div>
       </div>
-      <figure class="document-stage image-stage future-stage reveal">
+      <figure class="document-stage image-stage future-stage model-stage reveal" data-model-stage data-model-src="assets/models/padiglione.glb" data-model-alt="Modello 3D interattivo del padiglione con terrazze, scale e copertura" data-camera-orbit="-35deg 60deg 110%" data-model-return="Torna al render" data-model-note="Modello architettonico · materiali semplificati">
         <span class="document-tag">Architettura / paesaggio</span>
         <img src="assets/future-architecture-01.png" alt="Render di un'architettura contemporanea illuminata al tramonto in un paesaggio montano" width="1536" height="1024">
+        <div class="model-toolbar">
+          <button class="model-toggle" type="button" data-model-open aria-pressed="false"><span aria-hidden="true">◈</span> Esplora in 3D</button>
+          <button class="model-reset" type="button" data-model-reset hidden>Ripristina vista</button>
+        </div>
+        <p class="model-status" data-model-status role="status" aria-live="polite"></p>
         <figcaption class="media-caption">Territorio · luce · giardino</figcaption>
       </figure>
       <footer class="page-footer">

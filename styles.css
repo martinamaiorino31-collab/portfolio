@@ -401,6 +401,77 @@ em { color: var(--page-accent, var(--accent)); font-family: var(--serif); font-w
 .drawing-stage img { background: #fff; object-fit: contain; }
 .future-stage img { width: min(100%, 72rem); }
 
+.model-toolbar {
+  position: absolute;
+  z-index: 6;
+  right: 2.5rem;
+  bottom: 5.3rem;
+  left: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.model-toggle, .model-reset {
+  min-height: 2.7rem;
+  padding: .75rem 1.15rem;
+  border: 1px solid rgba(23,25,22,.25);
+  border-radius: 999px;
+  background: var(--paper-light);
+  color: var(--ink);
+  font-size: .6rem;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .2s ease, color .2s ease;
+}
+.model-toggle { background: var(--ink); color: var(--paper-light); }
+.model-toggle span { margin-right: .45rem; font-size: .85rem; }
+.model-toggle:hover { background: var(--page-accent); }
+.model-reset:hover { background: white; }
+.model-reset[hidden] { display: none; }
+.model-status {
+  position: absolute;
+  z-index: 5;
+  top: 4.2rem;
+  right: 2.5rem;
+  left: 2.5rem;
+  margin: 0;
+  color: rgba(23,25,22,.7);
+  font-size: .65rem;
+  line-height: 1.5;
+  text-align: center;
+  pointer-events: none;
+}
+.model-canvas {
+  position: absolute;
+  z-index: 4;
+  inset: 6rem 1.5rem 9rem;
+  width: calc(100% - 3rem);
+  height: calc(100% - 15rem);
+  display: block;
+  visibility: hidden;
+  background: transparent;
+  --poster-color: transparent;
+  --progress-bar-color: var(--page-accent);
+}
+.model-stage.is-3d > img:not(.model-snapshot),
+.model-stage.is-3d > video { visibility: hidden; pointer-events: none; }
+.model-stage.is-3d .model-canvas { visibility: visible; }
+.model-stage .model-snapshot {
+  max-width: none;
+  max-height: none;
+  object-fit: contain;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+.model-stage .model-snapshot:hover { transform: none; box-shadow: none; }
+.model-stage.is-model-loading .model-toggle { opacity: .75; }
+
 .board-page { background: var(--stage-bg); }
 .board-stage {
   height: calc(100svh - 72px);
@@ -647,7 +718,7 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
 html.is-page-turning .book-nav button { pointer-events: none; }
 html.book-ready .flip-clone {
   position: absolute !important;
-  inset: 0 auto auto 0 !important;
+  inset: var(--page-scroll, 0px) auto auto 0 !important;
   width: 100% !important;
   min-height: 100svh !important;
   max-height: none !important;
@@ -775,6 +846,10 @@ html.book-ready .flip-clone {
   .document-stage img { max-height: 67svh; }
   .document-stage.portrait img { height: min(66svh, 45rem); }
   .document-stage video { max-height: 64svh; }
+  .model-toolbar { right: 1.25rem; left: 1.25rem; bottom: 5.4rem; }
+  .model-status { top: 4rem; right: 1.5rem; left: 1.5rem; font-size: .6rem; }
+  .model-canvas { inset: 6rem .5rem 9rem; width: calc(100% - 1rem); }
+  .model-stage .media-caption { bottom: 2.6rem; }
   .board-stage { width: 100%; max-width: 100%; height: auto; min-height: calc(100svh - 64px); grid-template-rows: auto auto auto; align-content: start; overflow: hidden; padding: 1.5rem 1.25rem 6rem; }
   .board-stage > img { height: auto; max-height: 58svh; }
   .board-header { align-items: flex-start; flex-direction: column; gap: .3rem; }

@@ -33,6 +33,7 @@ let wheelIntent = 0;
 let wheelReset;
 let touchStartX = 0;
 let touchStartY = 0;
+let trackingTouch = false;
 
 const activePage = () => bookPages[currentBookPage];
 
@@ -97,12 +98,14 @@ const setBookPage = (index) => {
   prewarmPage(currentBookPage - 1);
   prewarmPage(currentBookPage + 1);
   updateBookNav();
+  document.dispatchEvent(new CustomEvent('portfolio:pagechange'));
 };
 
 const clonePageForTurn = (source) => {
   const clone = source.cloneNode(true);
   clone.classList.remove('is-active', 'is-before', 'is-after');
   clone.classList.add('flip-clone');
+  clone.removeAttribute('id');
   clone.removeAttribute('data-book-page');
   clone.setAttribute('aria-hidden', 'true');
   clone.querySelectorAll('[id]').forEach((element) => element.removeAttribute('id'));
@@ -112,7 +115,21 @@ const clonePageForTurn = (source) => {
     video.muted = true;
     video.setAttribute('preload', 'none');
   });
-  clone.style.top = `${-source.scrollTop}px`;
+  // A flip uses a still frame, so cloned pages never create extra WebGL scenes.
+  const liveViewers = [...source.querySelectorAll('model-viewer')];
+  clone.querySelectorAll('model-viewer').forEach((viewer, index) => {
+    const snapshot = document.createElement('img');
+    snapshot.className = 'model-canvas model-snapshot';
+    snapshot.alt = '';
+    try {
+      snapshot.src = liveViewers[index].toDataURL('image/png');
+    } catch {
+      snapshot.src = source.querySelector('video')?.poster ?? source.querySelector('img')?.src ?? '';
+    }
+    viewer.replaceWith(snapshot);
+  });
+  clone.querySelectorAll('.model-toolbar, .model-status').forEach((element) => element.remove());
+  clone.style.setProperty('--page-scroll', `${-source.scrollTop}px`);
   clone.style.height = `${Math.max(source.scrollHeight, source.clientHeight)}px`;
   return clone;
 };
@@ -181,11 +198,13 @@ const turnToPage = (index) => {
 
   const turningLeaf = buildTurningLeaf(current, target, forward);
   document.documentElement.classList.add('is-page-turning');
+  document.dispatchEvent(new CustomEvent('portfolio:turnstart'));
   window.setTimeout(() => setBookPage(nextIndex), turnDuration - 35);
   window.setTimeout(() => {
     turningLeaf.remove();
     document.documentElement.classList.remove('is-page-turning');
     turningPage = false;
+    document.dispatchEvent(new CustomEvent('portfolio:pagechange'));
   }, turnDuration + 45);
 };
 
@@ -206,6 +225,7 @@ document.querySelectorAll('a[href^="#"]').forEach((link) => {
 bookPages.forEach((page) => {
   page.addEventListener('scroll', updateBookProgress, { passive: true });
   page.addEventListener('wheel', (event) => {
+    if (event.target.closest('model-viewer, .model-toolbar')) return;
     if (turningPage) return;
     const horizontalSwipe = Math.abs(event.deltaX) > Math.abs(event.deltaY);
     const turnDelta = horizontalSwipe ? event.deltaX : event.deltaY;
@@ -228,10 +248,14 @@ bookPages.forEach((page) => {
   }, { passive: false });
 
   page.addEventListener('touchstart', (event) => {
+    trackingTouch = !event.target.closest('model-viewer, .model-toolbar, video');
+    if (!trackingTouch) return;
     touchStartX = event.changedTouches[0].clientX;
     touchStartY = event.changedTouches[0].clientY;
   }, { passive: true });
   page.addEventListener('touchend', (event) => {
+    if (!trackingTouch) return;
+    trackingTouch = false;
     const deltaX = event.changedTouches[0].clientX - touchStartX;
     const deltaY = event.changedTouches[0].clientY - touchStartY;
     if (Math.abs(deltaX) > 52 && Math.abs(deltaX) > Math.abs(deltaY) * 1.15) {
@@ -241,7 +265,7 @@ bookPages.forEach((page) => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.target.closest('input, textarea, select, button')) return;
+  if (event.target.closest('input, textarea, select, button, model-viewer, video')) return;
   const page = activePage();
   const atTop = page.scrollTop <= 1;
   const atBottom = page.scrollTop + page.clientHeight >= page.scrollHeight - 2;
