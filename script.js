@@ -10,7 +10,7 @@ const bookCurrent = document.querySelector('[data-book-current]');
 const bookTotal = document.querySelector('[data-book-total]');
 const bookTitle = document.querySelector('[data-book-title]');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const turnDuration = 1080;
+const turnDuration = 860;
 
 document.querySelectorAll('[data-year]').forEach((year) => {
   year.textContent = new Date().getFullYear();
@@ -36,6 +36,15 @@ let touchStartY = 0;
 
 const activePage = () => bookPages[currentBookPage];
 
+const prewarmPage = (index) => {
+  const page = bookPages[index];
+  if (!page) return;
+  page.querySelectorAll('img').forEach((image) => {
+    image.loading = 'eager';
+    if (!image.complete && image.decode) image.decode().catch(() => {});
+  });
+};
+
 const updateBookProgress = () => {
   const page = activePage();
   if (!page) return;
@@ -55,7 +64,8 @@ const updateBookNav = () => {
   if (bookPrevious) bookPrevious.disabled = currentBookPage === 0;
   if (bookNext) bookNext.disabled = currentBookPage === bookPages.length - 1;
   navLinks.forEach((link) => {
-    const isCurrent = link.getAttribute('href') === `#${page?.id}`;
+    const activeAnchor = page?.dataset.projectAnchor ?? `#${page?.id}`;
+    const isCurrent = link.getAttribute('href') === activeAnchor;
     if (isCurrent) link.setAttribute('aria-current', 'true');
     else link.removeAttribute('aria-current');
   });
@@ -84,6 +94,8 @@ const setBookPage = (index) => {
   });
   revealPage(page);
   history.replaceState(null, '', `#${page.id}`);
+  prewarmPage(currentBookPage - 1);
+  prewarmPage(currentBookPage + 1);
   updateBookNav();
 };
 

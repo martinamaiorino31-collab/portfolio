@@ -401,6 +401,41 @@ em { color: var(--page-accent, var(--accent)); font-family: var(--serif); font-w
 .drawing-stage img { background: #fff; object-fit: contain; }
 .future-stage img { width: min(100%, 72rem); }
 
+.board-page { background: var(--stage-bg); }
+.board-stage {
+  height: calc(100svh - 72px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(1rem, 2.2vh, 1.8rem);
+  margin: 0;
+  padding: clamp(1.5rem, 3.5vh, 3rem) var(--page-pad) clamp(5.8rem, 9vh, 7rem);
+  background: var(--stage-bg);
+}
+.board-header,
+.board-stage figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2rem;
+  color: rgba(23,25,22,.68);
+  font-size: .58rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.board-header strong { color: var(--ink); font-weight: 700; }
+.board-stage > img {
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: contain;
+  border: clamp(5px, .45vw, 8px) solid rgba(255,255,255,.95);
+  background: white;
+  box-shadow: 0 24px 56px rgba(23,25,22,.2);
+}
+.board-stage figcaption p { min-width: 0; max-width: 38rem; margin: 0; color: var(--ink); font-family: var(--serif); font-size: clamp(.78rem, 1vw, .96rem); letter-spacing: 0; line-height: 1.35; overflow-wrap: anywhere; text-align: right; text-transform: none; }
+
 .page-footer {
   position: absolute;
   z-index: 5;
@@ -474,6 +509,8 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
   pointer-events: none;
   perspective: 2600px;
   perspective-origin: center center;
+  contain: layout paint style;
+  transform: translateZ(0);
 }
 .book-underlay,
 .book-stationary {
@@ -485,9 +522,10 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
 .book-underlay {
   z-index: 1;
   transform: scale(1.008);
-  filter: saturate(.96) brightness(.96);
+  backface-visibility: hidden;
+  will-change: transform;
 }
-.book-stationary { z-index: 4; }
+.book-stationary { z-index: 4; contain: paint; }
 .book-stationary-left { clip-path: inset(0 50% 0 0); }
 .book-stationary-right { clip-path: inset(0 0 0 50%); }
 .book-hinge-shadow {
@@ -499,7 +537,6 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
   width: clamp(3rem, 9vw, 9rem);
   opacity: 0;
   background: radial-gradient(ellipse at center, rgba(23,25,21,.34), rgba(23,25,21,.12) 34%, transparent 72%);
-  filter: blur(11px);
   pointer-events: none;
   transform: translateX(-50%) scaleX(.28);
   will-change: opacity, transform;
@@ -521,9 +558,8 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
   top: 4%;
   bottom: 4%;
   left: calc(50% - 3.5rem);
-  width: 7rem;
-  background: radial-gradient(ellipse at center, rgba(23,25,21,.22), rgba(23,25,21,0) 68%);
-  filter: blur(14px);
+  width: 9rem;
+  background: radial-gradient(ellipse at center, rgba(23,25,21,.16), rgba(23,25,21,.06) 34%, rgba(23,25,21,0) 72%);
   opacity: .42;
   content: "";
 }
@@ -538,6 +574,7 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
   backface-visibility: hidden;
   transform-style: preserve-3d;
   box-shadow: 0 0 0 1px rgba(23,25,21,.08);
+  contain: paint;
 }
 .book-face::after {
   position: absolute;
@@ -585,7 +622,6 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
   width: min(18vw, 16rem);
   aspect-ratio: 1;
   opacity: 0;
-  filter: drop-shadow(-12px -10px 14px rgba(23,25,21,.2));
   pointer-events: none;
   backface-visibility: hidden;
 }
@@ -597,19 +633,17 @@ html.book-ready .book-page.is-after { visibility: hidden; z-index: 0; pointer-ev
 }
 .book-flip-next .book-curl { right: 0; transform-origin: right bottom; }
 .book-flip-next .book-curl::before { clip-path: polygon(100% 0, 0 100%, 100% 100%); }
-.book-flip-prev .book-curl { left: 0; transform-origin: left bottom; filter: drop-shadow(12px -10px 14px rgba(23,25,21,.2)); }
+.book-flip-prev .book-curl { left: 0; transform-origin: left bottom; }
 .book-flip-prev .book-curl::before { clip-path: polygon(0 0, 0 100%, 100% 100%); transform: scaleX(-1); }
-.book-flip-next.is-turning .book-leaf { animation: leafNext 1.08s cubic-bezier(.5,.03,.16,1) both; }
-.book-flip-prev.is-turning .book-leaf { animation: leafPrev 1.08s cubic-bezier(.5,.03,.16,1) both; }
-.book-flip-next.is-turning .book-face { animation: faceCurlNext 1.08s cubic-bezier(.5,.03,.16,1) both; }
-.book-flip-prev.is-turning .book-face { animation: faceCurlPrev 1.08s cubic-bezier(.5,.03,.16,1) both; }
-.book-flip-next.is-turning .book-curl { animation: curlNext 1.08s ease-in-out both; }
-.book-flip-prev.is-turning .book-curl { animation: curlPrev 1.08s ease-in-out both; }
-.book-flip.is-turning .book-paper-edge { animation: paperEdge 1.08s ease-in-out both; }
-.book-flip.is-turning .book-underlay { animation: targetSettle 1.08s cubic-bezier(.2,.7,.2,1) both; }
-.book-flip.is-turning .book-hinge-shadow { animation: hingeShadow 1.08s ease-in-out both; }
-.book-flip.is-turning .book-face-front::before { animation: frontShade 1.08s ease-in-out both; }
-.book-flip.is-turning .book-face-back::before { animation: backShade 1.08s ease-in-out both; }
+.book-flip-next.is-turning .book-leaf { animation: leafNext .86s cubic-bezier(.46,.02,.14,1) both; }
+.book-flip-prev.is-turning .book-leaf { animation: leafPrev .86s cubic-bezier(.46,.02,.14,1) both; }
+.book-flip-next.is-turning .book-curl { animation: curlNext .86s ease-in-out both; }
+.book-flip-prev.is-turning .book-curl { animation: curlPrev .86s ease-in-out both; }
+.book-flip.is-turning .book-paper-edge { animation: paperEdge .86s ease-in-out both; }
+.book-flip.is-turning .book-underlay { animation: targetSettle .86s cubic-bezier(.2,.7,.2,1) both; }
+.book-flip.is-turning .book-hinge-shadow { animation: hingeShadow .86s ease-in-out both; }
+.book-flip.is-turning .book-face-front::before { animation: frontShade .86s ease-in-out both; }
+.book-flip.is-turning .book-face-back::before { animation: backShade .86s ease-in-out both; }
 html.is-page-turning .book-nav button { pointer-events: none; }
 html.book-ready .flip-clone {
   position: absolute !important;
@@ -646,9 +680,8 @@ html.book-ready .flip-clone {
   100% { transform: rotateY(180deg) rotateZ(0) skewY(0) translateZ(0) scaleX(1); box-shadow: 0 0 0 rgba(23,25,21,0); }
 }
 @keyframes targetSettle {
-  0% { transform: scale(1.008); filter: saturate(.94) brightness(.92); }
-  48% { filter: saturate(.97) brightness(.96); }
-  100% { transform: scale(1); filter: none; }
+  0% { transform: scale(1.006); }
+  100% { transform: scale(1); }
 }
 @keyframes hingeShadow {
   0%, 100% { opacity: 0; transform: translateX(-50%) scaleX(.22); }
@@ -731,7 +764,7 @@ html.book-ready .flip-clone {
   .navigation.is-open { opacity: 1; pointer-events: auto; transform: none; }
   .navigation a { padding: .65rem 0; border-bottom: 1px solid var(--line); font-size: .67rem; }
   .book-page { padding-top: 64px; }
-  .cover, .project-page { width: 100vw; max-width: 100vw; min-width: 0; display: block; }
+  .cover, .project-page, .board-page { width: 100vw; max-width: 100vw; min-width: 0; display: block; }
   .cover-copy { min-height: calc(100svh - 64px); padding-top: 2rem; }
   .cover h1 { font-size: clamp(4.4rem, 22vw, 7.5rem); }
   .cover-archive { min-height: 100svh; }
@@ -742,6 +775,11 @@ html.book-ready .flip-clone {
   .document-stage img { max-height: 67svh; }
   .document-stage.portrait img { height: min(66svh, 45rem); }
   .document-stage video { max-height: 64svh; }
+  .board-stage { width: 100%; max-width: 100%; height: auto; min-height: calc(100svh - 64px); grid-template-rows: auto auto auto; align-content: start; overflow: hidden; padding: 1.5rem 1.25rem 6rem; }
+  .board-stage > img { height: auto; max-height: 58svh; }
+  .board-header { align-items: flex-start; flex-direction: column; gap: .3rem; }
+  .board-stage figcaption { align-items: flex-start; flex-direction: column; gap: .45rem; }
+  .board-stage figcaption p { width: 100%; max-width: 100%; text-align: left; }
   .document-tag { left: 2rem; }
   .document-open { right: 2rem; }
   .media-caption { right: 2rem; bottom: 5.7rem; }
